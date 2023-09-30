@@ -8,7 +8,7 @@ export const sortComparator = (
   const valueA = a[key];
   const valueB = b[key];
 
-  const type = isCommonType(valueA, valueB);
+  const type = getCommonSortType(valueA, valueB);
 
   switch (type) {
     case 'string':
@@ -26,14 +26,23 @@ export const sortComparator = (
         return -1;
       }
       return 0;
+    
+    // какая-то кастомная сложная логика - даты, например
+    // case 'date':
+    //   if (valueA > valueB) {
+    //     return 1;
+    //   } else if (valueA < valueB) {
+    //     return -1;
+    //   }
+    //   return 0;
 
     default:
       return 0;
   }
 };
 
-const isCommonType = (a: unknown, b: unknown) => {
-  if (typeof a !== typeof b) {
-    throw new Error('types are not comparable');
-  } else return typeof a;
+const getCommonSortType = (a: unknown, b: unknown): 'string' | 'number' => {
+  if (typeof a === typeof b && typeof a === 'number') {
+    return 'number';
+  } else return 'string';
 };

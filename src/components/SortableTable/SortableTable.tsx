@@ -1,30 +1,103 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { Table, Flex, Center, Text, Title, Button } from '@mantine/core';
 import {
-  Table,
-  Flex,
-  Center,
-  Text,
-  Title,
-} from '@mantine/core';
-import { useEffect, useLayoutEffect, useState } from 'react';
+  MouseEventHandler,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { sortComparator } from '../../utils/sortComparator';
 import { elements, IElement } from '../../data/elements';
-import { v4 as uuidv4 } from 'uuid';
-import { SortableTableHead } from '.';
+import { SmartTableCell, SortableTableHead } from '.';
 import { useSearchParams } from 'react-router-dom';
+import { v4 as uuid } from 'uuid';
+import { useEditedCellsStorage } from '../../utils/useEditedCellsStorage';
 
 export type SortOrder = 'ASC' | 'DESC';
 
 export const SortableTable = () => {
   const [searchParams, setSearchParams] = useSearchParams({
-    'sortedBy': Object.keys(elements)[0],
-    'order': 'ASC'
+    sortedBy: Object.keys(elements)[0],
+    order: 'ASC',
   });
 
-  const [data, setData] = useState<IElement[]>([]);
+  const [data, setData] = useState<IElement[]>(elements);
   const [sortedBy, setSortedBy] = useState<keyof IElement>('id');
   const [order, setOrder] = useState<SortOrder>('ASC');
+  const [editState, setEditState] = useState(false);
+  const [elementsEditedCount, cellsEditedCount, recordNewEditing, wasEdited] = useEditedCellsStorage(elements);
 
+  const editCell = useRef<{
+    id: string;
+    key: string;
+  }>({
+    id: '',
+    key: '',
+  });
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleCellClick: MouseEventHandler<HTMLTableSectionElement> = (e) => {
+    if (!(e.target instanceof HTMLElement)) {
+      return;
+    }
+    const cell = e.target.parentElement;
+
+    if (
+      !(cell instanceof HTMLTableCellElement) ||
+      editState ||
+      cell.dataset.key === 'id' ||
+      !cell.dataset.key
+    ) {
+      return;
+    }
+
+    setEditState(true);
+
+    const { id, key } = cell.dataset;
+
+    if (!id || !key) return;
+
+    editCell.current = { id, key };
+  };
+
+  // Хендлеры сохранения/отмены в edit-режиме
+  const handleCancel = () => {
+    setEditState(false);
+    editCell.current = { id: '', key: '' };
+  };
+
+  const handleSave = () => {
+    if (!inputRef.current) return;
+
+    const { id, key } = editCell.current;
+
+
+    const elIndex = data.findIndex((el) => {return String(el.id) === id});
+
+    const prevEl = data[elIndex]
+
+    const prevValue = prevEl[key as keyof IElement].toString()
+
+    if (prevValue !== inputRef.current.value) {
+
+      setData((prev) =>
+        prev.map((element) => {
+          if (String(element.id) !== id) {
+            return element;
+          }
+          return { ...element, [key]: inputRef.current?.value };
+        })
+      );
+  
+      recordNewEditing(Number(id), key as keyof IElement)
+    }
+
+    handleCancel();
+  };
+
+  // подгрузка из адресной строки параметров сортировки до отрисовки DOM
   useLayoutEffect(() => {
     const sortedBy = searchParams.get('sortedBy');
     if (sortedBy && Object.keys(elements[0]).includes(sortedBy)) {
@@ -36,9 +109,10 @@ export const SortableTable = () => {
     }
   }, []);
 
+  // Сортировка столбцов
   useEffect(() => {
     const orderMultiplyer = order === 'ASC' ? 1 : -1;
-    const sorted = [...elements].sort(
+    const sorted = [...data].sort(
       (a, b) => sortComparator(a, b, sortedBy) * orderMultiplyer
     );
     setData(sorted);
@@ -46,7 +120,7 @@ export const SortableTable = () => {
       sortedBy: sortedBy,
       order: order,
     });
-  }, [sortedBy, order]);
+  }, [sortedBy, order, editState]);
 
   const handleSortClick = (key: keyof IElement) => {
     if (key !== sortedBy) {
@@ -66,38 +140,75 @@ export const SortableTable = () => {
         gap="lg"
         justify="space-between">
         <Title mb={40}>MantineUI + React + React-router + Vite</Title>
-        <Table
-          verticalSpacing="md"
-          striped
-          highlightOnHover
-          withTableBorder
-          withColumnBorders>
-          <SortableTableHead
-            onClick={handleSortClick}
-            elements={elements}
-            sortedBy={sortedBy}
-            order={order}
-          />
-          <Table.Tbody>
-            {data.map((element, index) => (
-              <Table.Tr key={uuidv4()}>
-                <Table.Td key={`row-${index}`}>{ index + 1}</Table.Td>
+        <Table.ScrollContainer minWidth={"90vw"}>
 
-                {Object.values(element).map((value) => (
-                  <Table.Td key={value}>{value}</Table.Td>
-                ))}
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+          <Table
+            verticalSpacing="md"
+            striped
+            highlightOnHover
+            withTableBorder
+            withColumnBorders>
+            <SortableTableHead
+              onClick={handleSortClick}
+              elements={elements}
+              sortedBy={sortedBy}
+              order={order}
+            />
+            <Table.Tbody onClick={handleCellClick}>
+              {data.map((element, index) => (
+                <Table.Tr key={element.id}>
+                  <Table.Td key={'number'}>{index + 1}</Table.Td>
 
+                  {Object.entries(element).map(([key, value]) => {
+                    const isActive =
+                      editCell.current.id === element.id.toString() &&
+                      editCell.current.key === key;
+
+                    return (
+                      <>
+                        <SmartTableCell
+                          wasEdited={wasEdited(
+                            Number(element.id),
+                            key as keyof IElement
+                          )}
+                          value={value}
+                          elementId={element.id}
+                          colKey={key}
+                          key={key + uuid()}
+                          isActive={isActive}
+                          inputRef={inputRef || null}
+                        />
+                      </>
+                    );
+                  })}
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Table.ScrollContainer>
+        {editState && (
+          <>
+            <Button onClick={handleSave}>Сохранить</Button>
+            <Button onClick={handleCancel}>Отменить</Button>
+          </>
+        )}
         <Text>
           роутер подключен для дублирования информации о столбце и направлении
           сортировки из внутреннего стейта в query-параметры адреса и легкой
           передаче этого стейта путем копирования адресной строки. Пока без
           оптимизаций и анимаций, да они здесь и не нужны
         </Text>
+        <Text>
+          ячейки можно редактировать - кроме столбца ID, однако пока не подключена валидация. Также
+          все пока хранится внутри стейта, за исключением данных об измененнных
+          ячейках - для обработки истории изменений создан кастомный хук
+          useEditedCellsStorage. При вынесении данных и
+          обработчиков в стор в будущем, восприятие значительно упростится
+        </Text>
+        <Text>Элементов Изменено: {elementsEditedCount}</Text>
+        <Text>Всего внесено изменений: {cellsEditedCount}</Text>
       </Flex>
     </Center>
   );
 };
+
