@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Table, Flex, Center, Text, Title, Button } from '@mantine/core';
+import { Table, Flex, Center, Text, Title, Button, Group } from '@mantine/core';
 import {
   MouseEventHandler,
   useEffect,
@@ -132,7 +132,7 @@ export const SortableTable = () => {
   };
 
   return (
-    <Center pt={200}>
+    <Center pt={60}>
       <Flex
         w="80%"
         miw={320}
@@ -140,8 +140,7 @@ export const SortableTable = () => {
         gap="lg"
         justify="space-between">
         <Title mb={40}>MantineUI + React + React-router + Vite</Title>
-        <Table.ScrollContainer minWidth={"90vw"}>
-
+        <Table.ScrollContainer minWidth={'90vw'}>
           <Table
             verticalSpacing="md"
             striped
@@ -187,11 +186,22 @@ export const SortableTable = () => {
           </Table>
         </Table.ScrollContainer>
         {editState && (
-          <>
-            <Button onClick={handleSave}>Сохранить</Button>
-            <Button onClick={handleCancel}>Отменить</Button>
-          </>
+          <Flex justify="space-between" gap={20}>
+            <Group>
+              <Text size="xl">Элементов Изменено: {elementsEditedCount}</Text>
+              <Text size="xl">Всего внесено изменений: {cellsEditedCount}</Text>
+            </Group>
+            <Group>
+              <Button size="lg" onClick={handleSave}>
+                Сохранить
+              </Button>
+              <Button size="lg" onClick={handleCancel}>
+                Отменить
+              </Button>
+            </Group>
+          </Flex>
         )}
+
         <Text>
           роутер подключен для дублирования информации о столбце и направлении
           сортировки из внутреннего стейта в query-параметры адреса и легкой
@@ -199,14 +209,16 @@ export const SortableTable = () => {
           оптимизаций и анимаций, да они здесь и не нужны
         </Text>
         <Text>
-          ячейки можно редактировать - кроме столбца ID, однако пока не подключена валидация. Также
-          все пока хранится внутри стейта, за исключением данных об измененнных
-          ячейках - для обработки истории изменений создан кастомный хук
-          useEditedCellsStorage. При вынесении данных и
-          обработчиков в стор в будущем, восприятие значительно упростится
+          ячейки можно редактировать - кроме столбца ID, однако пока не
+          подключена валидация. Также все пока хранится внутри стейта, за
+          исключением данных об измененнных ячейках - для обработки истории
+          изменений создан кастомный хук useEditedCellsStorage. При вынесении
+          данных и обработчиков в стор в будущем, восприятие значительно
+          упростится
         </Text>
-        <Text>Элементов Изменено: {elementsEditedCount}</Text>
-        <Text>Всего внесено изменений: {cellsEditedCount}</Text>
+        <Text>
+          Таблица скроллится по горизонтали при переполнении
+        </Text>
       </Flex>
     </Center>
   );
