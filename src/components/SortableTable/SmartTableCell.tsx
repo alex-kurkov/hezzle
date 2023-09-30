@@ -72,6 +72,9 @@ export const SmartTableCell: FC<Props> = ({
               margin: 0,
               boxSizing: 'border-box',
               lineHeight: 2,
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              textWrap: 'nowrap',
             }}>
             {value}
           </Text>
