@@ -1,0 +1,22 @@
+.cell {
+  position: relative;
+
+  &__child {
+    background: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    outline: none;
+    border: none;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    margin: 0;
+  }
+
+  &__text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-wrap: nowrap;
+  }
+}

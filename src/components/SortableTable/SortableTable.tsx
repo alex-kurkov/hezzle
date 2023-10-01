@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { sortComparator } from '../../utils/sortComparator';
 import { elements, IElement } from '../../data/elements';
-import { SmartTableCell, SortableTableHead } from '.';
+import { SortableTableCell, SortableTableHead } from '.';
 import { useSearchParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import { useEditedCellsStorage } from '../../utils/useEditedCellsStorage';
@@ -26,7 +26,8 @@ export const SortableTable = () => {
   const [sortedBy, setSortedBy] = useState<keyof IElement>('id');
   const [order, setOrder] = useState<SortOrder>('ASC');
   const [editState, setEditState] = useState(false);
-  const [elementsEditedCount, cellsEditedCount, recordNewEditing, wasEdited] = useEditedCellsStorage(elements);
+  const [elementsEditedCount, cellsEditedCount, recordNewEditing, wasEdited] =
+    useEditedCellsStorage(elements);
 
   const editCell = useRef<{
     id: string;
@@ -73,15 +74,15 @@ export const SortableTable = () => {
 
     const { id, key } = editCell.current;
 
+    const elIndex = data.findIndex((el) => {
+      return String(el.id) === id;
+    });
 
-    const elIndex = data.findIndex((el) => {return String(el.id) === id});
+    const prevEl = data[elIndex];
 
-    const prevEl = data[elIndex]
-
-    const prevValue = prevEl[key as keyof IElement].toString()
+    const prevValue = prevEl[key as keyof IElement].toString();
 
     if (prevValue !== inputRef.current.value) {
-
       setData((prev) =>
         prev.map((element) => {
           if (String(element.id) !== id) {
@@ -90,8 +91,8 @@ export const SortableTable = () => {
           return { ...element, [key]: inputRef.current?.value };
         })
       );
-  
-      recordNewEditing(Number(id), key as keyof IElement)
+
+      recordNewEditing(Number(id), key as keyof IElement);
     }
 
     handleCancel();
@@ -132,9 +133,9 @@ export const SortableTable = () => {
   };
 
   return (
-    <Center pt={60}>
+    <Center pt={60} maw="100%">
       <Flex
-        w="80%"
+        p={20}
         miw={320}
         direction="column"
         gap="lg"
@@ -165,7 +166,7 @@ export const SortableTable = () => {
 
                     return (
                       <>
-                        <SmartTableCell
+                        <SortableTableCell
                           wasEdited={wasEdited(
                             Number(element.id),
                             key as keyof IElement
@@ -185,12 +186,12 @@ export const SortableTable = () => {
             </Table.Tbody>
           </Table>
         </Table.ScrollContainer>
-        {editState && (
-          <Flex justify="space-between" gap={20}>
-            <Group>
-              <Text size="xl">Элементов Изменено: {elementsEditedCount}</Text>
-              <Text size="xl">Всего внесено изменений: {cellsEditedCount}</Text>
-            </Group>
+        <Flex justify="space-between" gap={20}>
+          <Group>
+            <Text size="xl">Элементов Изменено: {elementsEditedCount}</Text>
+            <Text size="xl">Всего внесено изменений: {cellsEditedCount}</Text>
+          </Group>
+          {editState && (
             <Group>
               <Button size="lg" onClick={handleSave}>
                 Сохранить
@@ -199,8 +200,8 @@ export const SortableTable = () => {
                 Отменить
               </Button>
             </Group>
-          </Flex>
-        )}
+          )}
+        </Flex>
 
         <Text>
           роутер подключен для дублирования информации о столбце и направлении
@@ -216,11 +217,8 @@ export const SortableTable = () => {
           данных и обработчиков в стор в будущем, восприятие значительно
           упростится
         </Text>
-        <Text>
-          Таблица скроллится по горизонтали при переполнении
-        </Text>
+        <Text>Таблица скроллится по горизонтали при переполнении</Text>
       </Flex>
     </Center>
   );
 };
-

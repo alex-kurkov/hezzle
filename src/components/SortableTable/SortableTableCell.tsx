@@ -1,6 +1,7 @@
 import { Table, Text } from '@mantine/core';
 import { IElement } from '../../data/elements';
 import React, { ChangeEventHandler, FC, useState } from 'react';
+import classes from './SortableTableCell.module.scss';
 
 interface Props {
   value: string | number;
@@ -9,15 +10,17 @@ interface Props {
   isActive: boolean;
   wasEdited: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
+  key: string;
 }
 
-export const SmartTableCell: FC<Props> = ({
+export const SortableTableCell: FC<Props> = ({
   value,
   colKey,
   elementId,
   isActive,
   inputRef,
   wasEdited,
+  key,
 }) => {
   const [curValue, setCurValue] = useState(value);
 
@@ -27,31 +30,19 @@ export const SmartTableCell: FC<Props> = ({
   };
 
   return (
-    <>
-      <Table.Td
+    <Table.Td
+        key={key}
         data-id={elementId}
         data-key={colKey}
         bg={isActive ? 'blue' : wasEdited ? 'lime' : 'inherit'}
-        style={{
-          position: 'relative',
-        }}>
+        p={10}
+        m={0}
+        className={classes.cell}>
         {isActive ? (
           <input
             autoFocus
             type="text"
-            style={{
-              background: 'none',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              outline: 'none',
-              border: 'none',
-              width: '100%',
-              height: '100%',
-              padding: '10px 16px',
-              margin: 0,
-              boxSizing: 'border-box',
-            }}
+            className={classes.cell__child}
             placeholder={String(value)}
             ref={inputRef}
             onChange={handleChange}
@@ -59,27 +50,13 @@ export const SmartTableCell: FC<Props> = ({
           />
         ) : (
           <Text
-            style={{
-              background: 'none',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              outline: 'none',
-              border: 'none',
-              width: '100%',
-              height: '100%',
-              padding: '10px 16px',
-              margin: 0,
-              boxSizing: 'border-box',
-              lineHeight: 2,
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              textWrap: 'nowrap',
-            }}>
+            className={`${classes.cell__child} ${classes.cell__text}`}
+            lh={2}
+            p={10}
+            m={0}>
             {value}
           </Text>
         )}
       </Table.Td>
-    </>
   );
 };
