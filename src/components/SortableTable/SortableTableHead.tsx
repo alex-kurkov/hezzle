@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { Table, Flex, Text } from '@mantine/core';
 import { Icon } from '../Icon';
 import { v4 as uuidv4 } from 'uuid';
-import { SortOrder } from '.';
 
 interface Props {
   elements: IElement[];

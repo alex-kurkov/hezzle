@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { isObject } from './isObject';
+import { keyTypeGuard } from './keyTypeGuard';
 
 type EditableKey = keyof Omit<IElement, 'id'>;
 type IdKey = IElement['id'];
@@ -41,18 +42,15 @@ export const useEditStateHandling = (element: IElement): HookReturnType => {
   };
 
   const inferParams: InferParamsFn = (id?, key?) => {
-    const isCorrectKey = Boolean(
-      element && isObject(element) && key && key in element && key !== 'id'
-    );
-    // TODO typeGuard for key
-
+    const isCorrectKey = key && isObject(element) && keyTypeGuard(key, element) && key !== 'id'
+      
     const isCorrectNumber = Boolean(
       id && id.length !== 0 && !isNaN(Number(id))
     );
 
     return {
       id: isCorrectNumber ? Number(id) : null,
-      key: isCorrectKey ? (key as EditableKey) : null,
+      key: isCorrectKey ? key : null,
     };
   };
 
