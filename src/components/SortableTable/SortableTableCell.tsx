@@ -42,7 +42,6 @@ export const SortableTableCell: FC<Props> = ({
           <input
             autoFocus
             type="text"
-            className={classes.cell__child}
             placeholder={String(value)}
             ref={inputRef}
             onChange={handleChange}
@@ -50,7 +49,7 @@ export const SortableTableCell: FC<Props> = ({
           />
         ) : (
           <Text
-            className={`${classes.cell__child} ${classes.cell__text}`}
+            className={classes.cell__text}
             lh={2}
             p={10}
             m={0}>

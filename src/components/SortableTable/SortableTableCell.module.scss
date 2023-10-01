@@ -1,7 +1,7 @@
 .cell {
   position: relative;
 
-  &__child {
+  &>* {
     background: none;
     position: absolute;
     top: 0;
