@@ -28,7 +28,6 @@ export const SortableTableHead: FC<Props> = ({
             <Flex justify="space-between">
               <Text size="xl">{key.toLocaleUpperCase()} </Text>
               <Icon
-                color="#fff"
                 type={
                   sortedBy !== key
                     ? 'arrows'

@@ -12,7 +12,10 @@ export const sortComparator = (
 
   switch (type) {
     case 'string':
-      if (valueA > valueB) {
+      if (
+        valueA.toString().toLocaleLowerCase() >
+        valueB.toString().toLocaleLowerCase()
+      ) {
         return 1;
       } else if (valueA < valueB) {
         return -1;

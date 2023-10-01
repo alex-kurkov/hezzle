@@ -1,10 +1,13 @@
+import { useMantineColorScheme } from '@mantine/core';
 import { FC } from 'react';
 
 export type IconType = 'arrow-down' | 'arrow-up' | 'arrows' | 'moon' | 'sun';
 
-type IconComponent = FC<{ color: string; type: IconType; onClick?: () => void }>;
+type IconComponent = FC<{ type: IconType; onClick?: () => void }>;
 
-export const Icon: IconComponent = ({ color, onClick, type }) => {
+export const Icon: IconComponent = ({ onClick, type }) => {
+  const { colorScheme } = useMantineColorScheme();
+
   return (
     <svg
       onClick={onClick}
@@ -13,7 +16,7 @@ export const Icon: IconComponent = ({ color, onClick, type }) => {
       height="30"
       viewBox="0 0 24 24"
       strokeWidth="2"
-      stroke={color}
+      stroke={colorScheme === 'dark' ? 'white' : 'black'}
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round">
