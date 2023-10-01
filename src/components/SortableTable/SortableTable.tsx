@@ -133,92 +133,68 @@ export const SortableTable = () => {
   };
 
   return (
-    <Center pt={60} maw="100%">
-      <Flex
-        p={20}
-        miw={320}
-        direction="column"
-        gap="lg"
-        justify="space-between">
-        <Title mb={40}>MantineUI + React + React-router + Vite</Title>
-        <Table.ScrollContainer minWidth={'90vw'}>
-          <Table
-            verticalSpacing="md"
-            striped
-            highlightOnHover
-            withTableBorder
-            withColumnBorders>
-            <SortableTableHead
-              onClick={handleSortClick}
-              elements={elements}
-              sortedBy={sortedBy}
-              order={order}
-            />
-            <Table.Tbody onClick={handleCellClick}>
-              {data.map((element, index) => (
-                <Table.Tr key={element.id}>
-                  <Table.Td key={'number'}>{index + 1}</Table.Td>
+    <Flex p={20} miw={320} direction="column" gap="lg" justify="space-between">
+      <Table.ScrollContainer minWidth={'90vw'}>
+        <Table
+          verticalSpacing="md"
+          striped
+          highlightOnHover
+          withTableBorder
+          withColumnBorders>
+          <SortableTableHead
+            onClick={handleSortClick}
+            elements={elements}
+            sortedBy={sortedBy}
+            order={order}
+          />
+          <Table.Tbody onClick={handleCellClick}>
+            {data.map((element, index) => (
+              <Table.Tr key={element.id}>
+                <Table.Td key={'number'}>{index + 1}</Table.Td>
 
-                  {Object.entries(element).map(([key, value]) => {
-                    const isActive =
-                      editCell.current.id === element.id.toString() &&
-                      editCell.current.key === key;
+                {Object.entries(element).map(([key, value]) => {
+                  const isActive =
+                    editCell.current.id === element.id.toString() &&
+                    editCell.current.key === key;
 
-                    return (
-                      <>
-                        <SortableTableCell
-                          wasEdited={wasEdited(
-                            Number(element.id),
-                            key as keyof IElement
-                          )}
-                          value={value}
-                          elementId={element.id}
-                          colKey={key}
-                          key={key + uuid()}
-                          isActive={isActive}
-                          inputRef={inputRef || null}
-                        />
-                      </>
-                    );
-                  })}
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Table.ScrollContainer>
-        <Flex justify="space-between" gap={20}>
-          <Group>
-            <Text size="xl">Элементов Изменено: {elementsEditedCount}</Text>
-            <Text size="xl">Всего внесено изменений: {cellsEditedCount}</Text>
+                  return (
+                    <>
+                      <SortableTableCell
+                        wasEdited={wasEdited(
+                          Number(element.id),
+                          key as keyof IElement
+                        )}
+                        value={value}
+                        elementId={element.id}
+                        colKey={key}
+                        key={key + uuid()}
+                        isActive={isActive}
+                        inputRef={inputRef || null}
+                      />
+                    </>
+                  );
+                })}
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
+      <Flex justify="space-between" gap={20}>
+        <Group w="50%">
+          <Text size="xl">Элементов Изменено: {elementsEditedCount}</Text>
+          <Text size="xl">Всего внесено изменений: {cellsEditedCount}</Text>
+        </Group>
+        {editState && (
+          <Group w="50%">
+            <Button size="lg" w="100%" onClick={handleSave}>
+              Сохранить
+            </Button>
+            <Button size="lg" w="100%" onClick={handleCancel}>
+              Отменить
+            </Button>
           </Group>
-          {editState && (
-            <Group>
-              <Button size="lg" onClick={handleSave}>
-                Сохранить
-              </Button>
-              <Button size="lg" onClick={handleCancel}>
-                Отменить
-              </Button>
-            </Group>
-          )}
-        </Flex>
-
-        <Text>
-          роутер подключен для дублирования информации о столбце и направлении
-          сортировки из внутреннего стейта в query-параметры адреса и легкой
-          передаче этого стейта путем копирования адресной строки. Пока без
-          оптимизаций и анимаций, да они здесь и не нужны
-        </Text>
-        <Text>
-          ячейки можно редактировать - кроме столбца ID, однако пока не
-          подключена валидация. Также все пока хранится внутри стейта, за
-          исключением данных об измененнных ячейках - для обработки истории
-          изменений создан кастомный хук useEditedCellsStorage. При вынесении
-          данных и обработчиков в стор в будущем, восприятие значительно
-          упростится
-        </Text>
-        <Text>Таблица скроллится по горизонтали при переполнении</Text>
+        )}
       </Flex>
-    </Center>
+    </Flex>
   );
 };
