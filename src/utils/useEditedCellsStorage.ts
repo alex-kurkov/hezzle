@@ -1,6 +1,4 @@
 import { useRef, useState } from "react";
-import { IElement } from "../data/elements";
-
 
 type WasEditedFn = (id: IElement['id'], key: keyof IElement) => boolean
 type RecordNewEditingFn = (id: IElement['id'], key: keyof IElement) => void;

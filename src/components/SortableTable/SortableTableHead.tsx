@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import { Table, Flex, Text } from '@mantine/core';
-import { IElement } from '../../data/elements';
 import { Icon } from '../Icon';
 import { v4 as uuidv4 } from 'uuid';
 import { SortOrder } from '.';

@@ -8,13 +8,13 @@ import {
   useState,
 } from 'react';
 import { sortComparator } from '../../utils/sortComparator';
-import { elements, IElement } from '../../data/elements';
+import { elements } from '../../data/elements';
 import { SortableTableCell, SortableTableHead } from '.';
 import { useSearchParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import { useEditedCellsStorage } from '../../utils/useEditedCellsStorage';
-
-export type SortOrder = 'ASC' | 'DESC';
+import { useEditStateHandling } from '../../utils/useEditStateHandling';
+import { getPrevValueByIdAndKey } from '../../utils/getPrevValueById';
 
 export const SortableTable = () => {
   const [searchParams, setSearchParams] = useSearchParams({
@@ -25,17 +25,12 @@ export const SortableTable = () => {
   const [data, setData] = useState<IElement[]>(elements);
   const [sortedBy, setSortedBy] = useState<keyof IElement>('id');
   const [order, setOrder] = useState<SortOrder>('ASC');
-  const [editState, setEditState] = useState(false);
+
+  const { editState, editedId, editedKey, enableEditState, disableEditState } =
+    useEditStateHandling(elements[0]);
+
   const [elementsEditedCount, cellsEditedCount, recordNewEditing, wasEdited] =
     useEditedCellsStorage(elements);
-
-  const editCell = useRef<{
-    id: string;
-    key: string;
-  }>({
-    id: '',
-    key: '',
-  });
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -48,54 +43,33 @@ export const SortableTable = () => {
     if (
       !(cell instanceof HTMLTableCellElement) ||
       editState ||
-      cell.dataset.key === 'id' ||
-      !cell.dataset.key
+      !cell.dataset.key ||
+      cell.dataset.key === 'id'
     ) {
       return;
     }
-
-    setEditState(true);
-
-    const { id, key } = cell.dataset;
-
-    if (!id || !key) return;
-
-    editCell.current = { id, key };
+    enableEditState(cell.dataset?.id, cell.dataset.key);
   };
 
-  // Хендлеры сохранения/отмены в edit-режиме
-  const handleCancel = () => {
-    setEditState(false);
-    editCell.current = { id: '', key: '' };
-  };
-
+  // Хендлер сохранения в edit-режиме
   const handleSave = () => {
-    if (!inputRef.current) return;
+    if (!inputRef.current || !editedId || !editedKey) return;
 
-    const { id, key } = editCell.current;
-
-    const elIndex = data.findIndex((el) => {
-      return String(el.id) === id;
-    });
-
-    const prevEl = data[elIndex];
-
-    const prevValue = prevEl[key as keyof IElement].toString();
+    const prevValue = getPrevValueByIdAndKey(editedId, editedKey, data, true);
 
     if (prevValue !== inputRef.current.value) {
       setData((prev) =>
-        prev.map((element) => {
-          if (String(element.id) !== id) {
-            return element;
-          }
-          return { ...element, [key]: inputRef.current?.value };
-        })
+        prev.map((element) =>
+          element.id === editedId
+            ? { ...element, [editedKey]: inputRef.current?.value }
+            : element
+        )
       );
 
-      recordNewEditing(Number(id), key as keyof IElement);
+      recordNewEditing(editedId, editedKey);
     }
 
-    handleCancel();
+    disableEditState();
   };
 
   // подгрузка из адресной строки параметров сортировки до отрисовки DOM
@@ -153,9 +127,7 @@ export const SortableTable = () => {
                 <Table.Td key={'number'}>{index + 1}</Table.Td>
 
                 {Object.entries(element).map(([key, value]) => {
-                  const isActive =
-                    editCell.current.id === element.id.toString() &&
-                    editCell.current.key === key;
+                  const isActive = editedId === element.id && editedKey === key;
 
                   return (
                     <>
@@ -189,7 +161,7 @@ export const SortableTable = () => {
             <Button size="lg" w="100%" onClick={handleSave}>
               Сохранить
             </Button>
-            <Button size="lg" w="100%" onClick={handleCancel}>
+            <Button size="lg" w="100%" onClick={disableEditState}>
               Отменить
             </Button>
           </Group>

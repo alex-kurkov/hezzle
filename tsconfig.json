@@ -20,7 +20,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "typings"],
   "exclude": ["postcss.config.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

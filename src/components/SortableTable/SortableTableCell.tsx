@@ -1,5 +1,4 @@
 import { Table, Text } from '@mantine/core';
-import { IElement } from '../../data/elements';
 import React, { ChangeEventHandler, FC, useState } from 'react';
 import classes from './SortableTableCell.module.scss';
 
@@ -10,7 +9,6 @@ interface Props {
   isActive: boolean;
   wasEdited: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
-  key: string;
 }
 
 export const SortableTableCell: FC<Props> = ({
@@ -20,7 +18,6 @@ export const SortableTableCell: FC<Props> = ({
   isActive,
   inputRef,
   wasEdited,
-  key,
 }) => {
   const [curValue, setCurValue] = useState(value);
 
@@ -31,7 +28,6 @@ export const SortableTableCell: FC<Props> = ({
 
   return (
     <Table.Td
-        key={key}
         data-id={elementId}
         data-key={colKey}
         bg={isActive ? 'blue' : wasEdited ? 'lime' : 'inherit'}

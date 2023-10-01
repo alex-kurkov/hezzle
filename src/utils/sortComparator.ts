@@ -1,5 +1,3 @@
-import { IElement } from './../data/elements';
-
 export const sortComparator = (
   a: IElement,
   b: IElement,
