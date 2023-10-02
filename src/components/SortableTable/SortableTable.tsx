@@ -74,7 +74,7 @@ export const SortableTable = () => {
 
   return (
     <Stack p={20} miw={320} gap="sm" justify="space-between">
-      <Group w="100%">
+      <Group>
         <Text size="xl">Элементов Изменено: {elementsEditedCount}</Text>
         <Text size="xl">Всего внесено изменений: {cellsEditedCount}</Text>
       </Group>

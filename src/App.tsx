@@ -18,7 +18,7 @@ const router = createBrowserRouter(createRoutesFromElements(
 function App() {
   return (
     <MantineProvider defaultColorScheme="dark">
-      <Box maw="100%" w="100%" h="100vh">
+      <Box maw="100%" w="100%" h="100vh" style={{overflowX: 'hidden'}}>
         <Flex justify="space-between" align="center" p="md" gap="md">
           <ThemeToggler />
           <Title>MantineUI + React + React-router + Vite + TS</Title>
