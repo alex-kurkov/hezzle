@@ -19,4 +19,17 @@
     overflow: hidden;
     text-wrap: nowrap;
   }
+
+  &__tooltip {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-wrap: nowrap;
+    bottom: 0;
+    opacity: 0;
+    transition: opacity 300ms ease;
+
+    &[data-tooltip-visible=true] {
+      opacity: 1;
+    }
+  }
 }

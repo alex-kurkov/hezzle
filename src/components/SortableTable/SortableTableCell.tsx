@@ -1,4 +1,4 @@
-import { Table, Text, Tooltip } from '@mantine/core';
+import { Table, Text } from '@mantine/core';
 import React, { ChangeEventHandler, FC, useState } from 'react';
 import classes from './SortableTableCell.module.scss';
 
@@ -21,15 +21,15 @@ export const SortableTableCell: FC<Props> = ({
 }) => {
   const [curValue, setCurValue] = useState(value);
 
-  const [tooltipOpened, setTooltipOpened] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   // TODO логика валидации
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     if (typeof value === 'number' && /[^\d]/.test(e.target.value)) {
-      setTooltipOpened(true);
+      setTooltipVisible(true);
       return;
     }
-    if (tooltipOpened) setTooltipOpened(false);
+    if (tooltipVisible) setTooltipVisible(false);
     setCurValue(e.target.value);
   };
 
@@ -41,25 +41,30 @@ export const SortableTableCell: FC<Props> = ({
       p={10}
       m={0}
       className={classes.cell}>
-      <Tooltip
-        className={classes.cell}
-        label="Допускаются только цифры"
-        opened={tooltipOpened}>
-        {isActive ? (
+      {isActive ? (
+        <>
           <input
             autoFocus
             type="text"
             placeholder={String(value)}
             ref={inputRef}
             onChange={handleChange}
+            onFocus={handleChange}
             value={curValue}
           />
-        ) : (
-          <Text className={classes.cell__text} lh={2} p={10} m={0}>
-            {value}
+          <Text
+            className={classes.cell__tooltip}
+            c="red"
+            size="sm"
+            data-tooltip-visible={tooltipVisible}>
+            Только цифры
           </Text>
-        )}
-      </Tooltip>
+        </>
+      ) : (
+        <Text className={classes.cell__text} lh={2} p={10} m={0}>
+          {value}
+        </Text>
+      )}
     </Table.Td>
   );
 };
