@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Table, Flex, Text, Button, Group } from '@mantine/core';
+import { Table, Text, Button, Group, Stack } from '@mantine/core';
 import { MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { sortComparator } from '../../utils/sortComparator';
 import { elements } from '../../data/elements';
@@ -73,8 +73,8 @@ export const SortableTable = () => {
   }, [sortedBy, order, editState]);
 
   return (
-    <Flex p={20} miw={320} direction="column" gap="sm" justify="space-between">
-      <Group w="50%">
+    <Stack p={20} miw={320} gap="sm" justify="space-between">
+      <Group w="100%">
         <Text size="xl">Элементов Изменено: {elementsEditedCount}</Text>
         <Text size="xl">Всего внесено изменений: {cellsEditedCount}</Text>
       </Group>
@@ -107,7 +107,7 @@ export const SortableTable = () => {
                       colKey={key}
                       key={element.id + key}
                       isActive={isActive}
-                      inputRef={inputRef || null}
+                      inputRef={inputRef}
                     />
                   );
                 })}
@@ -117,7 +117,7 @@ export const SortableTable = () => {
         </Table>
       </Table.ScrollContainer>
       {editState && (
-        <Group w="100%">
+        <Group>
           <Button size="lg" w="100%" onClick={handleSave}>
             Сохранить
           </Button>
@@ -126,6 +126,6 @@ export const SortableTable = () => {
           </Button>
         </Group>
       )}
-    </Flex>
+    </Stack>
   );
 };
